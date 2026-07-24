@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a1628">
+<title>Cockpit do Investidor | Descubra o Preço Teto de Qualquer Ação em Segundos</title>
+<meta name="description" content="O Cockpit do Investidor calcula sozinho o valuation de ações e FIIs via API — métodos de Graham, Bazin, Lynch e Fluxo de Caixa Descontado. Sem Excel, sem achismo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --navy-950:#060f1c;
+  --navy-900:#0a1628;
+  --navy-800:#122036;
+  --navy-700:#1a2a4a;
+  --emerald-900:#06301f;
+  --emerald-700:#0a8f5b;
+  --emerald-500:#0ecb81;
+  --gold-500:#f5a623;
+  --gold-400:#ffc34d;
+  --gold-100:#fde9c8;
+  --paper:#f4f1e8;
+  --paper-2:#ece6d4;
+  --ink:#12202f;
+  --ink-soft:#3d4c5c;
+  --red-600:#c0433b;
+  --whatsapp:#25D366;
+  --line:rgba(18,32,47,0.12);
+  --line-dark:rgba(255,255,255,0.12);
+
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+
+  --container:1180px;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%; display:block;}
+a{color:inherit; text-decoration:none;}
+ul{list-style:none;}
+.container{max-width:var(--container); margin:0 auto; padding:0 24px;}
+
+a:focus-visible, button:focus-visible{outline:2px solid var(--gold-500); outline-offset:3px; border-radius:2px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+}
+
+/* ============ TYPOGRAPHY ============ */
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; letter-spacing:-0.01em;}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  font-weight:500;
+}
+.section-head{max-width:680px; margin:0 auto 56px; text-align:center;}
+.section-head h2{font-size:clamp(28px,4vw,42px); margin-top:14px;}
+.section-head p{font-size:17px; color:var(--ink-soft); margin-top:14px; line-height:1.6;}
+.section-head.light h2{color:var(--paper);}
+.section-head.light p{color:rgba(244,241,232,0.72);}
+.section-head.light .eyebrow{color:var(--gold-400);}
+.section-head .eyebrow{color:var(--emerald-700);}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font-family:var(--font-body); font-weight:700; font-size:15.5px;
+  padding:16px 30px; border-radius:3px; cursor:pointer; border:none;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  white-space:nowrap;
+}
+.btn-gold{
+  background:linear-gradient(180deg,var(--gold-400),var(--gold-500));
+  color:var(--navy-950);
+  box-shadow:0 1px 0 rgba(255,255,255,0.4) inset, 0 10px 24px -8px rgba(245,166,35,0.55);
+}
+.btn-gold:hover{transform:translateY(-2px); box-shadow:0 1px 0 rgba(255,255,255,0.5) inset, 0 16px 30px -8px rgba(245,166,35,0.7);}
+.btn-outline{
+  background:transparent; border:1.5px solid rgba(244,241,232,0.35); color:var(--paper);
+}
+.btn-outline:hover{border-color:var(--gold-400); color:var(--gold-400);}
+.btn-outline-dark{background:transparent; border:1.5px solid rgba(18,32,47,0.25); color:var(--ink);}
+.btn-outline-dark:hover{border-color:var(--emerald-700); color:var(--emerald-700);}
+.btn-block{width:100%;}
+.btn small{display:block; font-family:var(--font-mono); font-weight:500; font-size:11px; opacity:.7; margin-top:2px;}
+
+/* ============ NAV ============ */
+.nav{
+  position:sticky; top:0; z-index:100;
+  background:rgba(6,15,28,0.92); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line-dark);
+}
+.nav-inner{display:flex; align-items:center; justify-content:space-between; padding:15px 24px; max-width:var(--container); margin:0 auto; gap:20px;}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; color:var(--paper); flex-shrink:0;}
+.brand .dot{width:9px; height:9px; border-radius:50%; background:var(--gold-500); box-shadow:0 0 0 3px rgba(245,166,35,0.2); flex-shrink:0;}
+.brand .sub{font-family:var(--font-body); font-weight:400; opacity:.6;}
+.nav-links{display:flex; gap:28px; align-items:center;}
+.nav-links a{font-size:13.5px; color:rgba(244,241,232,0.75); font-weight:500;}
+.nav-links a:hover{color:var(--gold-400);}
+.nav .btn{padding:11px 20px; font-size:13.5px; flex-shrink:0;}
+.nav-links-desktop{display:flex;}
+@media (max-width:900px){.nav-links-desktop{display:none;} .brand{font-size:16px;}}
+
+/* ============ HERO ============ */
+.hero{
+  background:
+    radial-gradient(ellipse 900px 500px at 85% -10%, rgba(14,203,129,0.32), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 0% 100%, rgba(245,166,35,0.12), transparent 60%),
+    linear-gradient(180deg, var(--navy-950), var(--navy-900) 60%, var(--navy-900));
+  color:var(--paper);
+  padding:70px 0 88px;
+  position:relative;
+  border-bottom:1px solid var(--line-dark);
+  overflow:hidden;
+}
+.hero-grid{
+  display:grid; grid-template-columns:1.05fr 0.95fr; gap:60px; align-items:center;
+  max-width:var(--container); margin:0 auto; padding:0 24px;
+}
+.hero-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em;
+  color:var(--gold-400); border:1px solid rgba(245,166,35,0.4);
+  padding:7px 14px; border-radius:999px; margin-bottom:22px;
+  background:rgba(245,166,35,0.08);
+}
+.hero h1{
+  font-size:clamp(34px,4.4vw,54px); color:var(--paper); font-weight:600;
+}
+.hero h1 em{font-style:italic; color:var(--gold-400); font-weight:600;}
+.hero .sub{
+  font-size:18px; line-height:1.65; color:rgba(244,241,232,0.78);
+  margin:22px 0 32px; max-width:530px;
+}
+.hero-ctas{display:flex; gap:16px; flex-wrap:wrap; align-items:center;}
+.hero-trust{display:flex; gap:24px; margin-top:36px; flex-wrap:wrap;}
+.hero-trust div{font-family:var(--font-mono); font-size:11.5px; color:rgba(244,241,232,0.55);}
+.hero-trust strong{display:block; font-family:var(--font-display); font-size:21px; color:var(--gold-400); font-weight:600;}
+
+/* --- SIGNATURE: Régua do Preço Teto (ticker gauge card) --- */
+.ticker-card{
+  background:linear-gradient(180deg, var(--navy-800), var(--navy-900));
+  border:1px solid rgba(245,166,35,0.25);
+  border-radius:8px; padding:28px 26px 24px;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02) inset;
+  position:relative;
+}
+.ticker-card::before{
+  content:"AO VIVO NA PLANILHA"; position:absolute; top:-11px; left:24px;
+  background:var(--gold-500); color:var(--navy-950); font-family:var(--font-mono);
+  font-size:10px; letter-spacing:0.1em; font-weight:700; padding:4px 10px; border-radius:3px;
+}
+.ticker-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:22px;}
+.ticker-head .tk{font-family:var(--font-mono); font-size:22px; font-weight:600; color:var(--paper);}
+.ticker-head .method{font-family:var(--font-mono); font-size:11px; color:rgba(244,241,232,0.5);}
+.ticker-rows{display:flex; justify-content:space-between; margin-bottom:26px; gap:12px;}
+.ticker-rows .r{flex:1;}
+.ticker-rows .lbl{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(244,241,232,0.45); margin-bottom:6px;}
+.ticker-rows .val{font-family:var(--font-mono); font-size:19px; font-weight:600; color:var(--paper);}
+.ticker-rows .val.teto{color:var(--gold-400);}
+.ticker-rows .val.up{color:var(--emerald-500);}
+
+.gauge{height:10px; border-radius:999px; background:rgba(255,255,255,0.08); position:relative; margin-bottom:10px; overflow:visible;}
+.gauge-fill{
+  position:absolute; left:0; top:0; height:100%; border-radius:999px;
+  background:linear-gradient(90deg, var(--emerald-700), var(--emerald-500));
+  width:0%;
+  animation:fillGauge 1.8s 0.4s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes fillGauge{ to{ width:68%; } }
+.gauge-ceiling{
+  position:absolute; top:-7px; height:24px; width:2px; background:var(--gold-400); left:68%;
+  box-shadow:0 0 8px rgba(255,195,77,0.7);
+}
+.gauge-ceiling::after{
+  content:"TETO"; position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.06em; color:var(--gold-400);
+}
+.gauge-labels{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; color:rgba(244,241,232,0.4);}
+.ticker-verdict{
+  margin-top:20px; display:flex; align-items:center; gap:10px;
+  background:rgba(14,203,129,0.14); border:1px solid rgba(14,203,129,0.35);
+  padding:12px 14px; border-radius:5px;
+}
+.ticker-verdict .ic{width:20px; height:20px; border-radius:50%; background:var(--emerald-500); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.ticker-verdict .ic svg{width:12px; height:12px;}
+.ticker-verdict span{font-family:var(--font-mono); font-size:12.5px; color:#bdf5da; font-weight:500;}
+
+@media (max-width:940px){
+  .hero-grid{grid-template-columns:1fr; gap:48px;}
+}
+
+/* ============ MARQUEE / METHOD STRIP ============ */
+.marquee-strip{
+  background:var(--navy-950); border-bottom:1px solid var(--line-dark);
+  padding:14px 0; overflow:hidden; white-space:nowrap;
+}
+.marquee-track{display:inline-flex; gap:52px; animation:scroll 30s linear infinite; padding-left:52px;}
+.marquee-track span{
+  font-family:var(--font-mono); font-size:12.5px; letter-spacing:0.08em; color:rgba(244,241,232,0.42);
+  text-transform:uppercase;
+}
+.marquee-track span b{color:var(--gold-400);}
+@keyframes scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+/* ============ DOR / SOLUÇÃO ============ */
+.split-section{padding:100px 0; background:var(--paper);}
+.split-grid{display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+.split-col{padding:48px 44px;}
+.split-col.dor{background:#efe4de; border-right:1px solid var(--line);}
+.split-col.solucao{background:var(--navy-900); color:var(--paper);}
+.split-col .tag{font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;}
+.split-col.dor .tag{color:var(--red-600);}
+.split-col.solucao .tag{color:var(--gold-400);}
+.split-col h3{font-size:26px; margin:14px 0 20px;}
+.split-col.solucao h3{color:var(--paper);}
+.split-col ul{display:flex; flex-direction:column; gap:16px;}
+.split-col li{display:flex; gap:12px; font-size:15.5px; line-height:1.55;}
+.split-col.dor li{color:#5c3c33;}
+.split-col.solucao li{color:rgba(244,241,232,0.85);}
+.split-col li .mk{flex-shrink:0; width:20px; height:20px; margin-top:2px;}
+@media (max-width:820px){
+  .split-grid{grid-template-columns:1fr;}
+  .split-col.dor{border-right:none; border-bottom:1px solid var(--line);}
+}
+
+/* ============ DEMO SECTION ============ */
+.demo{padding:110px 0; background:var(--navy-950); color:var(--paper); position:relative;}
+.demo::before{
+  content:""; position:absolute; inset:0; opacity:0.5;
+  background:radial-gradient(ellipse 800px 400px at 50% 0%, rgba(14,203,129,0.16), transparent 65%);
+  pointer-events:none;
+}
+.demo-frame{
+  position:relative; border:1px solid rgba(245,166,35,0.3); border-radius:10px;
+  overflow:hidden; background:var(--navy-900); box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);
+  margin-bottom:18px;
+}
+.demo-frame .bar{
+  display:flex; align-items:center; gap:8px; padding:12px 16px; background:var(--navy-800);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.demo-frame .bar .d{width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.2);}
+.demo-frame .bar .cap{margin-left:12px; font-family:var(--font-mono); font-size:11.5px; color:rgba(244,241,232,0.5);}
+.demo-frame img{width:100%; display:block;}
+.demo-caption{text-align:center; font-family:var(--font-mono); font-size:13px; color:rgba(244,241,232,0.55); margin:0 auto 56px; max-width:680px; line-height:1.6;}
+.demo-caption b{color:var(--gold-400);}
+
+.demo-pair{display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start; margin-bottom:20px;}
+.demo-pair .col .demo-caption{margin-bottom:0;}
+@media (max-width:900px){.demo-pair{grid-template-columns:1fr;}}
+
+.demo-gallery{margin-top:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+.demo-card{
+  background:var(--navy-900); border:1px solid rgba(255,255,255,0.08); border-radius:8px; overflow:hidden;
+  transition:border-color .2s ease, transform .2s ease;
+}
+.demo-card:hover{border-color:rgba(245,166,35,0.4); transform:translateY(-4px);}
+.demo-card .thumb{aspect-ratio:16/10; overflow:hidden; border-bottom:1px solid rgba(255,255,255,0.06); background:var(--navy-950);}
+.demo-card .thumb img{width:100%; height:100%; object-fit:cover; object-position:top;}
+.demo-card .info{padding:16px 18px;}
+.demo-card .info .plan{font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-400); margin-bottom:6px; display:inline-block;}
+.demo-card .info h4{font-size:16px; color:var(--paper); font-family:var(--font-body); font-weight:700;}
+.demo-card .info p{font-size:13.2px; color:rgba(244,241,232,0.6); margin-top:6px; line-height:1.5;}
+
+.demo-card.placeholder{border:1.5px dashed rgba(245,166,35,0.45); background:rgba(245,166,35,0.03);}
+.demo-card.placeholder .thumb{display:flex; align-items:center; justify-content:center; background:rgba(245,166,35,0.05);}
+.demo-card.placeholder .thumb svg{width:36px; height:36px; opacity:0.55; stroke:var(--gold-400);}
+.demo-card.placeholder .info .plan{color:rgba(255,195,77,0.7);}
+.demo-card.placeholder .info h4{color:var(--gold-400);}
+
+@media (max-width:900px){.demo-gallery{grid-template-columns:1fr 1fr;}}
+@media (max-width:620px){.demo-gallery{grid-template-columns:1fr;}}
+
+/* ============ MÉTODOS GRID ============ */
+.methods{padding:110px 0; background:var(--paper);}
+.methods-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+.method-card{background:var(--paper); padding:30px 24px; transition:background .2s ease;}
+.method-card:hover{background:var(--paper-2);}
+.method-card .init{
+  font-family:var(--font-display); font-size:30px; font-weight:600; color:var(--emerald-700);
+  margin-bottom:14px;
+}
+.method-card h4{font-size:16px; font-weight:700; font-family:var(--font-body); margin-bottom:8px;}
+.method-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.55;}
+.method-card .plantag{
+  display:inline-block; margin-top:14px; font-family:var(--font-mono); font-size:10px;
+  letter-spacing:0.06em; text-transform:uppercase; padding:3px 9px; border-radius:3px;
+  background:rgba(245,166,35,0.15); color:#8a6d10; font-weight:600;
+}
+.method-card .plantag.vip{background:rgba(10,143,91,0.14); color:#0a6b45;}
+@media (max-width:900px){.methods-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:560px){.methods-grid{grid-template-columns:1fr;}}
+
+/* ============ PLANOS ============ */
+.plans{padding:110px 0; background:var(--navy-950); color:var(--paper); position:relative;}
+.plans-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch;}
+.plan-card{
+  background:var(--navy-900); border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+  padding:34px 28px; display:flex; flex-direction:column; position:relative;
+}
+.plan-card.featured{
+  border-color:var(--gold-500); background:linear-gradient(180deg, var(--navy-800), var(--navy-900));
+  box-shadow:0 30px 70px -25px rgba(245,166,35,0.35);
+  transform:translateY(-10px);
+}
+.plan-card.premium{border-color:rgba(14,203,129,0.5);}
+.plan-card .ribbon{
+  position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em; font-weight:700;
+  padding:5px 14px; border-radius:999px; white-space:nowrap;
+}
+.plan-card .ribbon.gold{background:var(--gold-500); color:var(--navy-950);}
+.plan-card .ribbon.emerald{background:var(--emerald-500); color:var(--navy-950);}
+.plan-card .step{font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; color:rgba(244,241,232,0.45); text-transform:uppercase;}
+.plan-card h3{font-size:23px; margin:10px 0 4px; color:var(--paper);}
+.plan-card .price{margin:16px 0 2px; display:flex; align-items:baseline; gap:6px;}
+.plan-card .price .num{font-family:var(--font-display); font-size:36px; font-weight:600; color:var(--paper);}
+.plan-card .price .cur{font-family:var(--font-mono); font-size:15px; color:rgba(244,241,232,0.6);}
+.plan-card .price .per{font-family:var(--font-mono); font-size:12px; color:rgba(244,241,232,0.45);}
+.plan-card .installment{font-family:var(--font-mono); font-size:11.5px; color:var(--emerald-500); margin-bottom:16px;}
+.plan-card .desc{font-size:13.3px; color:rgba(244,241,232,0.55); margin-bottom:20px; line-height:1.5;}
+.plan-card ul{display:flex; flex-direction:column; gap:11px; margin-bottom:26px; flex-grow:1;}
+.plan-card li{display:flex; gap:10px; font-size:13.6px; color:rgba(244,241,232,0.85); line-height:1.45;}
+.plan-card li .chk{flex-shrink:0; width:16px; height:16px; margin-top:2px; color:var(--emerald-500);}
+.plan-card li.inherit{color:rgba(244,241,232,0.5);}
+.plan-card li.inherit .chk{color:rgba(244,241,232,0.3);}
+.plan-card .btn{margin-top:auto;}
+
+@media (max-width:940px){.plans-grid{grid-template-columns:1fr; max-width:440px; margin:0 auto;} .plan-card.featured{transform:none;}}
+
+/* comparison table */
+.compare-wrap{margin-top:80px; overflow-x:auto; border:1px solid rgba(255,255,255,0.1); border-radius:8px;}
+table.compare{width:100%; border-collapse:collapse; min-width:680px;}
+table.compare th, table.compare td{padding:14px 20px; text-align:left; font-size:13.6px; border-bottom:1px solid rgba(255,255,255,0.07);}
+table.compare thead th{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+  background:var(--navy-900); color:rgba(244,241,232,0.6); font-weight:600;
+}
+table.compare thead th.plancol{color:var(--paper); font-size:14px; text-transform:none; letter-spacing:0;}
+table.compare thead th.plancol.gold{color:var(--gold-400);}
+table.compare thead th.plancol.emerald{color:var(--emerald-500);}
+table.compare tbody tr:nth-child(odd){background:rgba(255,255,255,0.02);}
+table.compare td{color:rgba(244,241,232,0.8); text-align:center;}
+table.compare td.cat{font-weight:600; color:var(--paper); text-align:left;}
+table.compare td.yes{color:var(--emerald-500); font-size:16px;}
+table.compare td.no{color:rgba(244,241,232,0.25); font-size:16px;}
+table.compare tbody tr.price-row td{font-weight:700; color:var(--paper); background:rgba(245,166,35,0.06); font-size:14.5px;}
+table.compare tbody tr.price-row td.gold{color:var(--gold-400);}
+table.compare tbody tr.price-row td.emerald{color:var(--emerald-500);}
+table.compare tbody tr.eco-row td{font-size:12.3px; font-family:var(--font-mono); color:rgba(244,241,232,0.55); background:transparent; font-weight:400;}
+
+/* ============ STEPS (ACESSO) ============ */
+.steps-section{padding:100px 0; background:var(--paper);}
+.steps-row{display:grid; grid-template-columns:repeat(3,1fr); gap:26px;}
+.step-card{background:#fff; border:1px solid var(--line); border-radius:8px; padding:32px 28px; position:relative;}
+.step-num{
+  font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--navy-900);
+  width:40px; height:40px; border-radius:50%; background:var(--gold-100);
+  display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  border:1.5px solid var(--gold-500);
+}
+.step-card h4{font-size:17.5px; margin-bottom:10px;}
+.step-card p{font-size:14.2px; color:var(--ink-soft); line-height:1.6;}
+.step-card .founder-note{
+  margin-top:14px; font-family:var(--font-mono); font-size:11.3px; color:#8a6d10;
+  background:rgba(245,166,35,0.1); padding:9px 11px; border-radius:4px; line-height:1.5;
+}
+@media (max-width:820px){.steps-row{grid-template-columns:1fr;}}
+
+/* ============ QUOTE BAND ============ */
+.quote-band{padding:80px 0; background:var(--navy-950); text-align:center; border-top:1px solid var(--line-dark); border-bottom:1px solid var(--line-dark);}
+.quote-band blockquote{
+  font-family:var(--font-display); font-style:italic; font-weight:500;
+  font-size:clamp(26px,4.2vw,46px); color:var(--paper); max-width:820px; margin:0 auto; line-height:1.25;
+}
+.quote-band cite{
+  display:block; margin-top:20px; font-family:var(--font-mono); font-style:normal;
+  font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-400);
+}
+
+/* ============ PROVA SOCIAL ============ */
+.social{padding:110px 0; background:var(--paper);}
+.testi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+.testi-card{
+  background:#fff; border:1px solid var(--line); border-radius:8px; padding:26px 22px;
+  display:flex; flex-direction:column; gap:16px;
+}
+.testi-stars{font-family:var(--font-mono); color:var(--gold-500); font-size:13px; letter-spacing:2px;}
+.testi-card p.quote{font-size:14px; line-height:1.6; color:var(--ink); font-style:italic;}
+.testi-person{display:flex; align-items:center; gap:11px; margin-top:auto;}
+.testi-avatar{
+  width:38px; height:38px; border-radius:50%; background:var(--navy-800);
+  display:flex; align-items:center; justify-content:center; color:var(--gold-400);
+  font-family:var(--font-display); font-weight:600; font-size:15px; flex-shrink:0;
+}
+.testi-person .name{font-weight:700; font-size:13px;}
+.testi-person .role{font-family:var(--font-mono); font-size:10.8px; color:var(--ink-soft);}
+.social-stat{
+  text-align:center; margin-bottom:40px; font-family:var(--font-mono); font-size:13px; color:var(--ink-soft);
+}
+.social-stat strong{color:var(--emerald-700); font-size:15px;}
+.social-note{
+  text-align:center; margin-top:40px; font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft);
+  border:1px dashed var(--line); padding:16px; border-radius:6px; max-width:680px; margin-left:auto; margin-right:auto;
+}
+@media (max-width:1000px){.testi-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:620px){.testi-grid{grid-template-columns:1fr;}}
+
+/* ============ GARANTIA ============ */
+.guarantee{padding:90px 0; background:var(--emerald-900); color:var(--paper);}
+.guarantee-inner{
+  display:grid; grid-template-columns:auto 1fr; gap:40px; align-items:center;
+  max-width:900px; margin:0 auto; padding:48px; border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+  background:rgba(255,255,255,0.03);
+}
+.seal{
+  width:118px; height:118px; border-radius:50%; border:2px solid var(--gold-400);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  font-family:var(--font-display); color:var(--gold-400); flex-shrink:0;
+}
+.seal .n{font-size:34px; font-weight:700; line-height:1;}
+.seal .t{font-family:var(--font-mono); font-size:9px; letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; text-align:center;}
+.guarantee h3{font-size:24px; color:var(--paper); margin-bottom:10px;}
+.guarantee p{font-size:15px; line-height:1.6; color:rgba(244,241,232,0.8);}
+@media (max-width:640px){.guarantee-inner{grid-template-columns:1fr; text-align:center; justify-items:center;}}
+
+/* ============ FAQ ============ */
+.faq{padding:110px 0; background:var(--paper);}
+.faq-list{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+.faq-item{border:1px solid var(--line); border-radius:6px; background:#fff; overflow:hidden;}
+.faq-q{
+  width:100%; text-align:left; padding:20px 24px; background:none; border:none; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  font-family:var(--font-body); font-size:15.3px; font-weight:600; color:var(--ink);
+}
+.faq-q .plus{
+  flex-shrink:0; width:22px; height:22px; border:1.5px solid var(--emerald-700); border-radius:50%;
+  position:relative; transition:transform .25s ease;
+}
+.faq-q .plus::before, .faq-q .plus::after{
+  content:""; position:absolute; background:var(--emerald-700); top:50%; left:50%;
+}
+.faq-q .plus::before{width:9px; height:1.5px; transform:translate(-50%,-50%);}
+.faq-q .plus::after{width:1.5px; height:9px; transform:translate(-50%,-50%); transition:opacity .2s ease;}
+.faq-item.open .faq-q .plus{transform:rotate(45deg);}
+.faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.faq-a p{padding:0 24px 22px; font-size:14.4px; line-height:1.65; color:var(--ink-soft); max-width:620px;}
+
+/* ============ CTA FINAL ============ */
+.cta-final{
+  padding:110px 0; text-align:center; color:var(--paper); position:relative; overflow:hidden;
+  background:linear-gradient(180deg, var(--navy-900), var(--navy-950));
+}
+.cta-final::before{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse 700px 400px at 50% 100%, rgba(245,166,35,0.16), transparent 65%);
+}
+.cta-final .inner{position:relative; max-width:640px; margin:0 auto;}
+.cta-final h2{font-size:clamp(28px,4.5vw,44px); color:var(--paper); margin:16px 0 18px;}
+.cta-final p{font-size:16.5px; color:rgba(244,241,232,0.72); margin-bottom:36px; line-height:1.6;}
+.cta-final .btn{padding:19px 42px; font-size:17px;}
+.cta-final .urgency{
+  margin-top:22px; font-family:var(--font-mono); font-size:12px; color:var(--gold-400);
+  letter-spacing:0.03em;
+}
+.cta-final .wa-link{
+  display:inline-flex; align-items:center; gap:8px; margin-top:26px;
+  font-family:var(--font-mono); font-size:12.5px; color:rgba(244,241,232,0.6);
+  border-top:1px solid rgba(255,255,255,0.1); padding-top:22px;
+}
+.cta-final .wa-link b{color:var(--whatsapp);}
+
+/* ============ FOOTER ============ */
+footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 30px; border-top:1px solid var(--line-dark);}
+.footer-grid{display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:40px; margin-bottom:36px;}
+.footer-grid h5{font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(244,241,232,0.4); margin-bottom:16px;}
+.footer-grid p, .footer-grid li{font-size:13.5px; line-height:1.7;}
+.footer-grid li a:hover{color:var(--gold-400);}
+.footer-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; color:var(--paper); margin-bottom:14px;}
+.access-note{
+  background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.25); border-radius:6px;
+  padding:14px 16px; font-size:12.3px; line-height:1.6; color:rgba(244,241,232,0.7); margin-top:16px;
+}
+.access-note b{color:var(--gold-400);}
+
+.founder-card{display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line-dark); padding:13px 15px; border-radius:6px; margin-bottom:12px;}
+.founder-avatar{width:38px; height:38px; border-radius:50%; background:var(--navy-700); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); color:var(--gold-400); font-weight:700; font-size:14px; flex-shrink:0;}
+.founder-info .name{font-size:13.3px; font-weight:700; color:var(--paper);}
+.founder-info .role{font-family:var(--font-mono); font-size:10.8px; color:rgba(244,241,232,0.5);}
+.wa-btn{display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px; color:var(--whatsapp); border:1px solid rgba(37,211,102,0.4); padding:9px 13px; border-radius:5px; margin-top:4px;}
+.wa-btn:hover{background:rgba(37,211,102,0.1);}
+.wa-btn svg{width:14px; height:14px;}
+
+.badges-row{display:flex; flex-wrap:wrap; gap:9px; margin-top:8px;}
+.badge-chip{display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10.8px; color:rgba(244,241,232,0.55); border:1px solid var(--line-dark); padding:6px 10px; border-radius:4px;}
+.badge-chip svg{width:12px; height:12px; opacity:0.7; flex-shrink:0;}
+
+.footer-legal{
+  border-top:1px solid var(--line-dark); padding-top:22px; display:flex; justify-content:space-between;
+  flex-wrap:wrap; gap:12px; font-size:12px; font-family:var(--font-mono); color:rgba(244,241,232,0.35);
+}
+.footer-legal-note{
+  font-size:11.5px; line-height:1.7; color:rgba(244,241,232,0.3); max-width:900px; margin:0 auto 22px;
+  text-align:center; font-family:var(--font-body); padding-top:22px; border-top:1px solid var(--line-dark);
+}
+
+/* ============ STICKY CTA (aparece ao rolar) ============ */
+.sticky-cta{
+  position:fixed; bottom:0; left:0; right:0; z-index:90; background:var(--navy-950);
+  border-top:1px solid rgba(245,166,35,0.3); padding:12px 16px; display:flex;
+  align-items:center; justify-content:space-between; gap:12px;
+  box-shadow:0 -10px 30px rgba(0,0,0,0.3);
+  opacity:0; transform:translateY(100%); transition:opacity .3s ease, transform .3s ease; pointer-events:none;
+}
+.sticky-cta.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+.sticky-cta .info{font-family:var(--font-mono); font-size:11px; color:rgba(244,241,232,0.6);}
+.sticky-cta .info b{display:block; color:var(--paper); font-family:var(--font-body); font-size:14px;}
+.sticky-cta .btn{padding:12px 22px; font-size:13.5px;}
+@media (max-width:520px){.sticky-cta .info{display:none;}}
+
+/* reveal on scroll */
+.reveal{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span>Cockpit <span class="sub">do Investidor</span></div>
+    <div class="nav-links nav-links-desktop">
+      <a href="#demo">Demonstração</a>
+      <a href="#metodos">Métodos</a>
+      <a href="#planos">Planos</a>
+      <a href="#faq">Perguntas</a>
+    </div>
+    <a href="#planos" class="btn btn-gold">Comprar Agora</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">● COCKPIT DO INVESTIDOR — Sistema de Valuation com API</div>
+      <h1>Descubra o <em>Preço Teto</em> de qualquer ação em segundos.</h1>
+      <p class="sub">O Cockpit calcula sozinho o valuation de ações e FIIs pelos métodos de Graham, Bazin, Peter Lynch e Fluxo de Caixa Descontado. Clique em "Calcular": o robô busca os dados na API e devolve o preço que vale a pena pagar. Chega de achismo e de planilha manual.</p>
+      <div class="hero-ctas">
+        <a href="#planos" class="btn btn-gold">Quero o Cockpit<small>Acesso liberado após confirmação</small></a>
+        <a href="#demo" class="btn btn-outline">Ver funcionando ↓</a>
+      </div>
+      <div class="hero-trust">
+        <div><strong>7</strong>métodos de valuation</div>
+        <div><strong>&lt;5s</strong>por cálculo via API</div>
+        <div><strong>Ações · FIIs · ETFs</strong>tudo em um só lugar</div>
+      </div>
+    </div>
+
+    <div class="ticker-card reveal">
+	  <div class="ticker-head">
+		<span class="tk">PETR4</span>
+		<span class="method">FLUXO DE CAIXA DESCONTADO</span>
+	  </div>
+	  <div class="ticker-rows">
+		<div class="r">
+		  <div class="lbl">Preço Atual</div>
+		  <!-- Adicionado id="petr4-price" -->
+		  <div class="val" id="petr4-price">R$ --,--</div> 
+		</div>
+		<div class="r">
+		  <div class="lbl">Preço Teto</div>
+		  <!-- Teto mantido estático, mas o JS vai usar esse valor -->
+		  <div class="val teto" id="petr4-teto">R$ 43,65</div>
+		</div>
+		<div class="r">
+		  <div class="lbl">Upside</div>
+		  <!-- Adicionado id="petr4-upside" -->
+		  <div class="val up" id="petr4-upside">--%</div>
+		</div>
+	  </div>
+	  <div class="gauge">
+		<!-- Adicionado id="petr4-gauge" para animar a barra -->
+		<div class="gauge-fill" id="petr4-gauge" style="width: 0%;"></div>
+		<div class="gauge-ceiling"></div>
+	  </div>
+	  <div class="gauge-labels"><span>R$ 0</span><span>Margem de segurança</span></div>
+	  
+	  <!-- Adicionado id="petr4-verdict" -->
+	  <div class="ticker-verdict" id="petr4-verdict">
+		<span class="ic" id="petr4-icon">
+		  <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#060f1c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+		</span>
+		<span id="petr4-verdict-text">CALCULANDO...</span>
+	  </div>
+	</div>
+  </div>
+</header>
+
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span>Método <b>GRAHAM</b> — Margem de Segurança</span>
+    <span>Método <b>BAZIN</b> — Preço por Dividendos</span>
+    <span>Método <b>GORDON (GD)</b> — Crescimento de Proventos</span>
+    <span>Método <b>PETER LYNCH</b> — PEG Ratio Ajustado</span>
+    <span>Método <b>FCD</b> — Fluxo de Caixa Descontado</span>
+    <span>Radar de Ações e FIIs — Oportunidades em Tempo Real</span>
+    <span>Método <b>GRAHAM</b> — Margem de Segurança</span>
+    <span>Método <b>BAZIN</b> — Preço por Dividendos</span>
+    <span>Método <b>GORDON (GD)</b> — Crescimento de Proventos</span>
+    <span>Método <b>PETER LYNCH</b> — PEG Ratio Ajustado</span>
+    <span>Método <b>FCD</b> — Fluxo de Caixa Descontado</span>
+    <span>Radar de Ações e FIIs — Oportunidades em Tempo Real</span>
+  </div>
+</div>
+
+<!-- ============ DOR / SOLUÇÃO ============ -->
+<section class="split-section">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">O problema real</div>
+      <h2>Você já comprou uma ação e viu ela desabar depois?</h2>
+      <p>Ou pior: ficou de fora de uma alta de 30% porque não sabia se o preço já estava caro. As duas dores vêm do mesmo lugar — decidir sem saber o preço teto.</p>
+    </div>
+    <div class="split-grid reveal">
+      <div class="split-col dor">
+        <div class="tag">Sem um sistema</div>
+        <h3>Você decide no feeling</h3>
+        <ul>
+          <li><span class="mk">✕</span>Compra no topo achando que "ainda vai subir" — e vê o preço desabar depois.</li>
+          <li><span class="mk">✕</span>Baixa histórico da B3, monta fórmula no Excel, erra uma referência de célula e perde a tarde.</li>
+          <li><span class="mk">✕</span>Decide só pelo P/L, ignorando dívida, payout e ROE — e paga caro sem perceber.</li>
+          <li><span class="mk">✕</span>Descobre o preço justo depois que a ação já subiu 20%.</li>
+        </ul>
+      </div>
+      <div class="split-col solucao">
+        <div class="tag">Com o Cockpit do Investidor</div>
+        <h3>Clique em "Calcular" e o robô faz tudo</h3>
+        <ul>
+          <li><span class="mk">✓</span>O robô busca os dados do ativo na API — sem baixar nada da B3 manualmente.</li>
+          <li><span class="mk">✓</span>Sete metodologias consagradas rodam sozinhas e cruzam o resultado.</li>
+          <li><span class="mk">✓</span>Você não precisa saber Excel nem VBA — só preencher suas premissas.</li>
+          <li><span class="mk">✓</span>Um painel único ("Super Decisão") te diz: Aportar, Aguardar ou Evitar.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="section-head light reveal">
+      <div class="eyebrow">Por dentro do Cockpit</div>
+      <h2>Veja o robô calculando de verdade</h2>
+      <p>Nada de captura de tela estática de resultado pronto. É a própria planilha, ao vivo, buscando o ativo na API e populando cada indicador antes dos seus olhos.</p>
+    </div>
+
+    <!-- PRINT 2: BancoDeAções — busca automática via API -->
+    <div class="demo-frame reveal">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="cap">BancoDeAções — Buscando ITUB4 na API...</span></div>
+      <img src="https://drive.google.com/file/d/1iwd7N4KCLLa71_YL1F03uyRsfxMoJlgA/view" alt="Planilha buscando dados do ativo ITUB4 automaticamente via API, com todos os indicadores de preço, rentabilidade e dividendos preenchidos nas colunas." loading="eager">
+    </div>
+    <p class="demo-caption">Um clique no <b>Robô Integrado</b>. O Cockpit conecta na API e preenche <b>Preço, P/L, P/VPA, ROE, Margem, DY, Payout e Dívida</b> — sem copiar e colar nada.</p>
+
+    <!-- PRINT 1: Preço Teto de vários ativos + histórico de valuations -->
+    <div class="demo-frame reveal">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="cap">Valuation FCD — Preço Teto de dezenas de ativos, lado a lado</span></div>
+      <img src="assets/fcd.png" alt="Planilha de Fluxo de Caixa Descontado com premissas de crescimento, taxa de desconto e uma tabela de histórico com o preço teto calculado para dezenas de ativos diferentes." loading="lazy">
+    </div>
+    <p class="demo-caption">O método mais sofisticado da casa: <b>Fluxo de Caixa Descontado</b> com premissas 100% ajustáveis — e um histórico com o preço teto de cada ativo que você já calculou.</p>
+
+    <div class="demo-gallery">
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/bazin.png" alt="Aba Bazin com preço teto por dividendos, meta de yield e decisão de aportar ou aguardar para cada ativo" loading="lazy"></div>
+        <div class="info"><span class="plan">Básico</span><h4>Bazin — Renda hoje</h4><p>Preço teto calculado pela sua meta de yield. Decisão automática: Aportar ou Aguardar.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/graham.png" alt="Aba Graham com margem de segurança e preço teto calculado pela fórmula clássica de Benjamin Graham" loading="lazy"></div>
+        <div class="info"><span class="plan">Básico</span><h4>Graham — Comprar barato</h4><p>Margem de segurança de cada ativo frente ao valor patrimonial e lucro por ação.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/etfs.png" alt="Aba de ETFs mostrando alocação atual, meta ideal por percentual e decisão de aportar ou aguardar" loading="lazy"></div>
+        <div class="info"><span class="plan">Básico</span><h4>ETFs — Alocação por meta</h4><p>Compara sua alocação atual com sua meta ideal e diz onde você "ficou para trás".</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/crescimento-lynch-garp.png" alt="Aba Crescimento com CAGR de lucros de 5 anos, PEG Ratio e ROE aplicando o método GARP de Peter Lynch" loading="lazy"></div>
+        <div class="info"><span class="plan">PRO</span><h4>Crescimento (GARP)</h4><p>Cruza CAGR de lucros de 5 anos com PEG Ratio e ROE para achar crescimento barato.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/gd-gordon.png" alt="Aba GD (Gordon Growth) com ROE, payout, margem líquida e dívida líquida para projetar crescimento sustentável de dividendos" loading="lazy"></div>
+        <div class="info"><span class="plan">PRO</span><h4>Gordon Growth (GD)</h4><p>Projeta o crescimento sustentável dos dividendos considerando payout e ROE.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/lynch.png" alt="Aba Peter Lynch com fórmula ajustada por dividendos comparando crescimento, dividend yield e P/L" loading="lazy"></div>
+        <div class="info"><span class="plan">PRO</span><h4>Peter Lynch</h4><p>PEG Ratio ajustado por dividendos: crescimento a um preço que faça sentido.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/projetivo.png" alt="Aba Projetivo mostrando lucro projetado por número de papéis, payout e meta de yield para estimar o preço teto" loading="lazy"></div>
+        <div class="info"><span class="plan">PRO</span><h4>Projetivo</h4><p>Projeta o lucro futuro por número de papéis e payout para estimar o preço teto.</p></div>
+      </div>
+      <!-- PRINT 3: Super Decisão consolidando todos os métodos -->
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/super-decisao.png" alt="Painel Super Decisão consolidando score, meta de alocação, upside e status final de cada ativo da carteira" loading="lazy"></div>
+        <div class="info"><span class="plan">VIP</span><h4>Super Decisão</h4><p>Cruza todos os métodos com sua alocação atual e devolve um veredito único por ativo.</p></div>
+      </div>
+      <!-- PRINT 4: Radar Ações com as oportunidades do dia -->
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/radar-acoes.png" alt="Radar de ações rankeando as 10 melhores oportunidades combinando valor, dividendos e crescimento" loading="lazy"></div>
+        <div class="info"><span class="plan">VIP</span><h4>Radar de Ações</h4><p>Ranking automático das melhores oportunidades do momento, ordenadas por score.</p></div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="thumb"><img src="assets/radar-fiis.png" alt="Radar de FIIs rankeando os 10 melhores fundos imobiliários por preço, P/VP, dividend yield e liquidez" loading="lazy"></div>
+        <div class="info"><span class="plan">VIP</span><h4>Radar de FIIs</h4><p>Mesmo ranking automático, aplicado aos melhores Fundos Imobiliários do momento.</p></div>
+      </div>
+      <!-- PRINT 5: espaço reservado — menu Robô Integrado (sem screenshot disponível ainda) -->
+      <div class="demo-card placeholder reveal">
+        <div class="thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+        </div>
+        <div class="info"><span class="plan">Print 5</span><h4>Menu Robô Integrado</h4><p>Espaço reservado — insira aqui o print do menu com as opções de atualização.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MÉTODOS ============ -->
+<section class="methods" id="metodos">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Autoridade, não achismo</div>
+      <h2>Sete métodos consagrados, rodando ao mesmo tempo</h2>
+      <p>Cada investidor lendário olhou o mercado de um jeito. O Cockpit aplica todos eles no mesmo ativo — e mostra onde concordam.</p>
+    </div>
+    <div class="methods-grid reveal">
+      <div class="method-card">
+        <div class="init">Gr</div>
+        <h4>Graham</h4>
+        <p>Fórmula clássica de valor intrínseco via LPA e VPA. A base da segurança patrimonial.</p>
+        <span class="plantag">Básico</span>
+      </div>
+      <div class="method-card">
+        <div class="init">Bz</div>
+        <h4>Bazin</h4>
+        <p>Preço teto pela sua meta de dividend yield. Ideal para quem monta renda passiva.</p>
+        <span class="plantag">Básico</span>
+      </div>
+      <div class="method-card">
+        <div class="init">GD</div>
+        <h4>Gordon Growth</h4>
+        <p>Projeta o crescimento sustentável dos dividendos considerando payout e ROE.</p>
+        <span class="plantag">PRO</span>
+      </div>
+      <div class="method-card">
+        <div class="init">Ly</div>
+        <h4>Peter Lynch</h4>
+        <p>PEG Ratio ajustado por dividendos: crescimento a um preço que faça sentido.</p>
+        <span class="plantag">PRO</span>
+      </div>
+      <div class="method-card">
+        <div class="init">Cr</div>
+        <h4>Crescimento (GARP)</h4>
+        <p>Cruza CAGR de lucros de 5 anos com PEG Ratio e ROE para achar crescimento barato.</p>
+        <span class="plantag">PRO</span>
+      </div>
+      <div class="method-card">
+        <div class="init">Pj</div>
+        <h4>Projetivo</h4>
+        <p>Projeta o lucro futuro por número de papéis e payout para estimar o preço teto.</p>
+        <span class="plantag">PRO</span>
+      </div>
+      <div class="method-card">
+        <div class="init">FCD</div>
+        <h4>Fluxo de Caixa Descontado</h4>
+        <p>O método mais sofisticado do mercado: traz o valor da empresa a valor presente.</p>
+        <span class="plantag vip">VIP</span>
+      </div>
+      <div class="method-card">
+        <div class="init">SD</div>
+        <h4>Super Decisão</h4>
+        <p>Consolida todos os métodos, cruza com sua alocação e recomenda a ação final.</p>
+        <span class="plantag vip">VIP</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLANOS ============ -->
+<section class="plans" id="planos">
+  <div class="container">
+    <div class="section-head light reveal">
+      <div class="eyebrow">Escolha seu nível de profundidade</div>
+      <h2>Um investimento anual. Clareza para o resto da vida útil da sua carteira.</h2>
+      <p>Preço promocional atual — sujeito a reajuste sem aviso prévio nas próximas renovações.</p>
+    </div>
+
+    <div class="plans-grid">
+      <div class="plan-card reveal">
+        <div class="step">Nível 01</div>
+        <h3>Básico</h3>
+        <div class="price"><span class="cur">R$</span><span class="num">147</span><span class="per">/ano</span></div>
+        <div class="installment">ou 12x de R$ 12,25</div>
+        <p class="desc">Para quem quer parar de comprar no escuro e já sair calculando o preço teto hoje.</p>
+        <ul>
+          <li><span class="chk">✓</span>Resumo dos Ativos — dashboard geral da carteira</li>
+          <li><span class="chk">✓</span>Banco de Ações — busca automática via API</li>
+          <li><span class="chk">✓</span>Cockpit — visão consolidada de valuation</li>
+          <li><span class="chk">✓</span>Valuation Bazin (dividendos) e Graham (valor)</li>
+          <li><span class="chk">✓</span>Análise de FIIs e ETFs</li>
+          <li><span class="chk">✓</span>Config de premissas + Apoio a Aportes</li>
+        </ul>
+        <a href="LINK_PAGAMENTO_BASICO" class="btn btn-outline btn-block">Começar com o Básico</a>
+      </div>
+
+      <div class="plan-card featured reveal">
+        <div class="ribbon gold">⭐ Mais vendido</div>
+        <div class="step">Nível 02</div>
+        <h3>PRO</h3>
+        <div class="price"><span class="cur">R$</span><span class="num">347</span><span class="per">/ano</span></div>
+        <div class="installment">ou 12x de R$ 28,91</div>
+        <p class="desc">Para quem quer enxergar crescimento futuro, não só o preço de hoje.</p>
+        <ul>
+          <li class="inherit"><span class="chk">✓</span>Tudo do plano Básico</li>
+          <li><span class="chk">✓</span>Valuation Crescimento (GARP)</li>
+          <li><span class="chk">✓</span>Valuation Gordon Growth (GD)</li>
+          <li><span class="chk">✓</span>Valuation Peter Lynch (PEG Ratio)</li>
+          <li><span class="chk">✓</span>Valuation Projetivo (5 anos)</li>
+        </ul>
+        <a href="LINK_PAGAMENTO_PRO" class="btn btn-gold btn-block">Quero o PRO</a>
+      </div>
+
+      <div class="plan-card premium reveal">
+        <div class="ribbon emerald">🏆 Completo</div>
+        <div class="step">Nível 03</div>
+        <h3>VIP</h3>
+        <div class="price"><span class="cur">R$</span><span class="num">697</span><span class="per">/ano</span></div>
+        <div class="installment">ou 12x de R$ 58,08</div>
+        <p class="desc">A ferramenta definitiva: o mesmo motor de decisão que uma mesa profissional usaria.</p>
+        <ul>
+          <li class="inherit"><span class="chk">✓</span>Tudo do Básico + PRO</li>
+          <li><span class="chk">✓</span>Fluxo de Caixa Descontado (FCD) — o carro-chefe</li>
+          <li><span class="chk">✓</span>Painel Super Decisão</li>
+          <li><span class="chk">✓</span>Radar de Ações e Radar de FIIs</li>
+          <li><span class="chk">✓</span>Inputs personalizados (Ações e FIIs)</li>
+        </ul>
+        <a href="LINK_PAGAMENTO_VIP" class="btn btn-outline btn-block">Quero o VIP</a>
+      </div>
+    </div>
+
+    <div class="compare-wrap reveal">
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>O que você desbloqueia</th>
+            <th class="plancol">Básico</th>
+            <th class="plancol gold">PRO ⭐</th>
+            <th class="plancol emerald">VIP 🏆</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="cat">Valuation Bazin</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation Graham</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Análise de FIIs</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Análise de ETFs</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation Crescimento</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation Gordon Growth</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation Peter Lynch</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation Projetivo</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Valuation FCD</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Painel Super Decisão</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Radar de Ações</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Radar de FIIs</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr><td class="cat">Inputs Personalizados</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr class="price-row"><td class="cat">Preço Anual</td><td>R$ 147</td><td class="gold">R$ 347</td><td class="emerald">R$ 697</td></tr>
+          <tr class="price-row"><td class="cat">Parcelamento</td><td>12x R$ 12,25</td><td class="gold">12x R$ 28,91</td><td class="emerald">12x R$ 58,08</td></tr>
+          <tr class="eco-row"><td class="cat">Economia</td><td>—</td><td>Economize R$ 350 vs o VIP</td><td>Pacote completo — todos os métodos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMO FUNCIONA O ACESSO ============ -->
+<section class="steps-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Depois da compra</div>
+      <h2>Como funciona o acesso — 3 passos</h2>
+      <p>Sem central de atendimento genérica. O acesso é liberado pessoalmente pelo fundador.</p>
+    </div>
+    <div class="steps-row reveal">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h4>Compre e comprove</h4>
+        <p>Escolha seu plano, finalize o pagamento (Pix, cartão ou boleto) e envie o comprovante.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h4>Receba seu CPF e Token</h4>
+        <p>Você recebe por e-mail o seu CPF de acesso (login), um Token único (senha) e o link para copiar a planilha mestra.</p>
+        <div class="founder-note">Enviado pessoalmente por Delber Dallegrave, fundador do Cockpit.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h4>Copie, autentique e comece</h4>
+        <p>Faça sua cópia pessoal no Google Sheets, insira CPF e Token nos campos indicados e clique em "Autenticar". Todos os módulos do seu plano são liberados na hora.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE BAND ============ -->
+<section class="quote-band">
+  <div class="container">
+    <blockquote class="reveal">"Jamais pague caro por uma ação."</blockquote>
+    <cite>— O princípio por trás do Cockpit do Investidor</cite>
+  </div>
+</section>
+
+<!-- ============ PROVA SOCIAL ============ -->
+<section class="social">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Quem já usa</div>
+      <h2>Investidores que trocaram achismo por dado</h2>
+    </div>
+    <p class="social-stat reveal">Já são <strong>+[XXX] investidores</strong> usando o Cockpit para não pagar caro por uma ação.</p>
+    <div class="testi-grid reveal">
+      <!-- PRINT/DEPOIMENTO 1: evitou uma compra cara -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="quote">"Ia aportar em uma ação só porque 'todo mundo estava comprando'. O Cockpit mostrou upside negativo de -20%. Economizei o aporte do mês."</p>
+        <div class="testi-person">
+          <div class="testi-avatar">R.</div>
+          <div><div class="name">[Nome do cliente]</div><div class="role">Investidor há 4 anos</div></div>
+        </div>
+      </div>
+      <!-- PRINT/DEPOIMENTO 2: economia de tempo com busca automática -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="quote">"Eu levava um domingo inteiro atualizando minha planilha manual. Hoje clico em Calcular e está pronto antes do café esfriar."</p>
+        <div class="testi-person">
+          <div class="testi-avatar">M.</div>
+          <div><div class="name">[Nome do cliente]</div><div class="role">Carteira com 22 ativos</div></div>
+        </div>
+      </div>
+      <!-- PRINT/DEPOIMENTO 3: não sabe Excel, mesmo assim funciona -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="quote">"Nunca fui bom de Excel. Mas nunca precisei — só preencher as premissas e clicar. O resto é o Cockpit que faz."</p>
+        <div class="testi-person">
+          <div class="testi-avatar">L.</div>
+          <div><div class="name">[Nome do cliente]</div><div class="role">Iniciante em valuation</div></div>
+        </div>
+      </div>
+      <!-- PRINT/DEPOIMENTO 4: upgrade de plano + suporte direto do fundador -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="quote">"Comecei no Básico só pra testar. Duas semanas depois fiz upgrade pro VIP — o Super Decisão sozinho já valeu o ano. E o suporte é direto com o Delber."</p>
+        <div class="testi-person">
+          <div class="testi-avatar">F.</div>
+          <div><div class="name">[Nome do cliente]</div><div class="role">Upgrade Básico → VIP</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="social-note reveal">Espaço reservado para prints reais de depoimentos (WhatsApp / Google Reviews) e para o número real de investidores atendidos. Substitua o texto entre colchetes antes de publicar.</div>
+  </div>
+</section>
+
+<!-- ============ GARANTIA ============ -->
+<section class="guarantee">
+  <div class="container">
+    <div class="guarantee-inner reveal">
+      <div class="seal"><span class="n">7</span><span class="t">Dias de<br>Garantia</span></div>
+      <div>
+        <h3>Teste sem risco por 7 dias</h3>
+        <p>Se nos primeiros 7 dias você não conseguir calcular o valuation de uma única ação com o Cockpit, devolvemos 100% do seu dinheiro. Sem perguntas, sem burocracia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Antes de decidir</div>
+      <h2>Perguntas frequentes</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q"><span>Preciso saber Excel para usar?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>Não! Tudo é automatizado. Você só preenche as premissas nas células indicadas (meta de yield, taxa de desconto etc.) e clica nos botões já prontos — toda a lógica de cálculo já está construída.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Como recebo o acesso depois de comprar?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>Após a confirmação do pagamento, Delber Dallegrave (fundador) envia por e-mail o seu CPF de acesso (login), um Token único (senha) e o link para você fazer sua própria cópia da planilha mestra. O acesso é vinculado ao seu CPF — pessoal e intransferível.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>A planilha funciona mesmo? Como funciona a API?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>Sim. Ao clicar em "Calcular" ou no Robô Integrado, um script conectado à planilha consulta uma API de cotações e indicadores fundamentalistas e preenche as colunas automaticamente — preço, P/L, ROE, dividendos e mais.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Posso testar antes de comprar?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>A garantia de 7 dias cobre exatamente isso: use o Cockpit à vontade, calcule o valuation dos seus ativos e, se não fizer sentido pra você, devolvemos 100% do valor — sem perguntas.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Qual a diferença entre os planos?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>O Básico traz os métodos essenciais (Graham e Bazin) além de FIIs e ETFs. O PRO adiciona 4 métodos avançados de crescimento (Gordon, Lynch, Crescimento e Projetivo). O VIP tem absolutamente tudo, incluindo o Fluxo de Caixa Descontado, o painel Super Decisão e os Radares de oportunidades.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Posso fazer upgrade depois?</span><span class="plus"></span></button>
+        <div class="faq-a"><p>Sim. Você pode migrar do Básico para o PRO ou VIP a qualquer momento, pagando apenas a diferença proporcional para o plano superior.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section class="cta-final">
+  <div class="container inner">
+    <div class="eyebrow" style="color:var(--gold-400)">Última chamada</div>
+    <h2>Pare de comprar ações no achismo.</h2>
+    <p>Tenha o preço teto de qualquer ativo em segundos — e a segurança de nunca mais pagar caro por uma boa empresa.</p>
+    <a href="#planos" class="btn btn-gold">Garantir meu Cockpit agora</a>
+    <div class="urgency">Preço promocional atual — sujeito a reajuste sem aviso prévio.</div>
+    <div class="wa-link">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.44 1.32 4.94L2 22l5.28-1.38a9.9 9.9 0 004.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2z" opacity="0"/><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.24-.46-2.37-1.46-.87-.78-1.47-1.73-1.64-2.03-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.12-.27-.2-.57-.35z" fill="#25D366"/></svg>
+      Prefere tirar dúvidas antes? <b>Fale direto com o Delber no WhatsApp →</b>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--gold-500);display:inline-block;"></span>Cockpit do Investidor</div>
+        <p>Planilha de valuation de ações, FIIs e ETFs com busca automática de dados via API. Sete métodos consagrados de análise, um único painel de decisão.</p>
+        <div class="access-note">
+          <b>Como funciona o acesso:</b> após a confirmação do pagamento, você recebe por e-mail seu CPF de acesso e o Token da planilha. O uso é vinculado ao CPF do comprador — acesso pessoal e intransferível.
+        </div>
+      </div>
+      <div>
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="#demo">Demonstração</a></li>
+          <li><a href="#metodos">Métodos de valuation</a></li>
+          <li><a href="#planos">Planos e preços</a></li>
+          <li><a href="#faq">Perguntas frequentes</a></li>
+        </ul>
+        <h5 style="margin-top:24px;">Legal</h5>
+        <ul>
+          <li><a href="#">Política de Privacidade</a></li>
+          <li><a href="#">Termos de Uso</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Fale com o fundador</h5>
+        <div class="founder-card">
+          <div class="founder-avatar">DD</div>
+          <div class="founder-info"><div class="name">Delber Dallegrave</div><div class="role">Fundador — Cockpit do Investidor</div></div>
+        </div>
+        <a href="https://wa.me/5554999959755" target="_blank" rel="noopener" class="wa-btn">
+          <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.24-.46-2.37-1.46-.87-.78-1.47-1.73-1.64-2.03-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.12-.27-.2-.57-.35z"/></svg>
+          (54) 99995-9755
+        </a>
+        <div class="badges-row">
+          <span class="badge-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Pagamento seguro</span>
+          <span class="badge-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Pix · Cartão · Boleto</span>
+          <span class="badge-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>Mercado Pago / PagSeguro</span>
+        </div>
+      </div>
+    </div>
+    <p class="footer-legal-note">Esta ferramenta é um instrumento de apoio à análise e não constitui recomendação de compra ou venda de ativos. As cotações e indicadores são fornecidos "no estado em que se encontram", apenas para fins informativos. As decisões de investimento são de responsabilidade exclusiva do usuário.</p>
+    <div class="footer-legal">
+      <span>© 2026 Cockpit do Investidor. Todos os direitos reservados.</span>
+      <span>Delber Dallegrave · (54) 99995-9755</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ STICKY CTA (aparece ao rolar) ============ -->
+<div class="sticky-cta" id="stickyCta">
+  <div class="info">A partir de<b>R$ 147/ano</b></div>
+  <a href="#planos" class="btn btn-gold">Comprar Agora</a>
+</div>
+
+<script>
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{threshold:0.12});
+reveals.forEach(el=>io.observe(el));
+
+// Sticky CTA aparece depois que o Hero sai da tela
+const heroEl = document.querySelector('.hero');
+const stickyBar = document.getElementById('stickyCta');
+if(heroEl && stickyBar){
+  const heroIO = new IntersectionObserver(([entry])=>{
+    stickyBar.classList.toggle('show', !entry.isIntersecting);
+  },{threshold:0});
+  heroIO.observe(heroEl);
+}
+
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item=>{
+  const q = item.querySelector('.faq-q');
+  const a = item.querySelector('.faq-a');
+  q.addEventListener('click', ()=>{
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(o=>{
+      if(o!==item){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; }
+    });
+    if(isOpen){
+      item.classList.remove('open');
+      a.style.maxHeight = null;
+    } else {
+      item.classList.add('open');
+      a.style.maxHeight = a.scrollHeight + 'px';
+    }
+  });
+});
+	//Pega o Preço automaticamente
+  async function atualizarTickerLP() {
+    // 1. Defina o ativo e o seu preço teto estático
+    const ticker = 'PETR4';
+    const precoTeto = 43.65; 
+
+    try {
+      // 2. Busca o preço atual na API pública (brapi)
+      const resposta = await fetch(`https://brapi.dev/api/quote/${ticker}`);
+      const dados = await resposta.json();
+      const precoAtual = dados.results[0].regularMarketPrice;
+
+      // 3. Cálculos Financeiros
+      const upside = ((precoTeto / precoAtual) - 1) * 100;
+      const porcentagemBarra = Math.min((precoAtual / precoTeto) * 100, 100);
+
+      // 4. Formatando os valores para o padrão brasileiro (R$ 0,00)
+      const precoFormatado = precoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const upsideFormatado = upside.toFixed(1).replace('.', ',') + '%';
+
+      // 5. Injetando os dados no HTML
+      document.getElementById('petr4-price').innerText = `R$ ${precoFormatado}`;
+      document.getElementById('petr4-gauge').style.width = `${porcentagemBarra}%`;
+      
+      const elUpside = document.getElementById('petr4-upside');
+      const elVerdict = document.getElementById('petr4-verdict-text');
+      const elIcon = document.getElementById('petr4-icon');
+
+      // 6. Lógica visual: Se estiver barato, fica verde. Se estiver caro, alerta.
+      if (upside > 0) {
+        elUpside.innerText = `+${upsideFormatado}`;
+        elUpside.style.color = '#00ff88'; // Sua cor verde
+        elVerdict.innerText = 'ABAIXO DO PREÇO TETO';
+        
+        // Mantém o ícone de check
+        elIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#060f1c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      } else {
+        elUpside.innerText = `${upsideFormatado}`;
+        elUpside.style.color = '#ff4444'; // Cor vermelha de alerta
+        elVerdict.innerText = 'ACIMA DO PREÇO TETO';
+        
+        // Troca para um ícone de 'X' ou alerta
+        elIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#060f1c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      }
+
+    } catch (erro) {
+      console.error("Falha ao buscar dados financeiros da LP:", erro);
+      document.getElementById('petr4-price').innerText = "R$ Indisponível";
+    }
+  }
+
+  // 7. Executa a função assim que o site carregar
+  document.addEventListener('DOMContentLoaded', atualizarTickerLP);
+</script>	
+</body>
+</html>
