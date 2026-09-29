@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a1628">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <title>Cockpit do Investidor | O painel de instrumentos para suas decisões de investimento</title>
 <meta name="description" content="Você é o piloto. O Cockpit do Investidor reúne os instrumentos para analisar preço teto, valuation, dividendos, crescimento e alocação de ações, FIIs e ETFs antes do próximo aporte.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,7 +110,8 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; 
 }
 .nav-inner{display:flex; align-items:center; justify-content:space-between; padding:15px 24px; max-width:var(--container); margin:0 auto; gap:20px;}
 .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; color:var(--paper); flex-shrink:0;}
-.brand .dot{width:9px; height:9px; border-radius:50%; background:var(--gold-500); box-shadow:0 0 0 3px rgba(245,166,35,0.2); flex-shrink:0;}
+.brand .mark, .footer-brand .mark{width:30px; height:30px; color:var(--gold-400); flex-shrink:0;}
+.footer-brand .mark{width:26px; height:26px;}
 .brand .sub{font-family:var(--font-body); font-weight:400; opacity:.6;}
 .nav-links{display:flex; gap:28px; align-items:center;}
 .nav-links a{font-size:13.5px; color:rgba(244,241,232,0.75); font-weight:500;}
@@ -592,7 +592,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
 <!-- ============ NAV ============ -->
 <nav class="nav">
   <div class="nav-inner">
-    <div class="brand"><span class="dot"></span>Cockpit <span class="sub">do Investidor</span></div>
+    <div class="brand"><svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false"><polyline points="6,54 18,42 27,48 41,26" stroke="currentColor" stroke-opacity=".7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="42" r="4" fill="currentColor" fill-opacity=".7"/><circle cx="27" cy="48" r="4" fill="currentColor" fill-opacity=".7"/><path transform="translate(50 16) rotate(45) scale(.68)" d="M0 -20 C3 -20 4 -14 4 -8 L20 4 L20 8 L4 3 L4 12 L10 17 L10 20 L0 17 L-10 20 L-10 17 L-4 12 L-4 3 L-20 8 L-20 4 L-4 -8 C-4 -14 -3 -20 0 -20 Z" fill="currentColor"/></svg><span>Cockpit <span class="sub">do Investidor</span></span></div>
     <div class="nav-links nav-links-desktop">
       <a href="#demo">Instrumentos</a>
       <a href="#metodos">Métodos</a>
@@ -1116,7 +1116,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
   <div class="container">
     <div class="footer-grid">
       <div>
-        <div class="footer-brand"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--gold-500);display:inline-block;"></span>Cockpit do Investidor</div>
+        <div class="footer-brand"><svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false"><polyline points="6,54 18,42 27,48 41,26" stroke="currentColor" stroke-opacity=".7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="42" r="4" fill="currentColor" fill-opacity=".7"/><circle cx="27" cy="48" r="4" fill="currentColor" fill-opacity=".7"/><path transform="translate(50 16) rotate(45) scale(.68)" d="M0 -20 C3 -20 4 -14 4 -8 L20 4 L20 8 L4 3 L4 12 L10 17 L10 20 L0 17 L-10 20 L-10 17 L-4 12 L-4 3 L-20 8 L-20 4 L-4 -8 C-4 -14 -3 -20 0 -20 Z" fill="currentColor"/></svg><span>Cockpit do Investidor</span></div>
         <p>Assim como o cockpit reúne os instrumentos do piloto, o Cockpit do Investidor reúne os instrumentos para analisar ações, FIIs e ETFs, com busca automática de dados via API. Sete métodos consagrados de análise, um único painel de decisão.</p>
         <div class="access-note">
           <b>Como funciona o acesso:</b> após a confirmação do pagamento, você recebe por e-mail seu CPF de acesso e o Token da planilha. O uso é vinculado ao CPF do comprador — acesso pessoal e intransferível.
