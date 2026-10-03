@@ -119,6 +119,13 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; 
 .nav .btn{padding:11px 20px; font-size:13.5px; flex-shrink:0;}
 .nav-links-desktop{display:flex;}
 @media (max-width:900px){.nav-links-desktop{display:none;} .brand{font-size:16px;}}
+@media (max-width:430px){
+  .nav-inner{padding:12px 16px; gap:12px;}
+  .brand{font-size:15px; gap:8px;}
+  .brand .mark{width:26px; height:26px;}
+  .nav .btn{padding:10px 14px; font-size:12.5px;}
+}
+@media (max-width:380px){.brand .sub{display:none;}}
 
 /* ============ HERO ============ */
 .hero{
@@ -152,6 +159,7 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; 
   margin:22px 0 32px; max-width:530px;
 }
 .hero-ctas{display:flex; gap:16px; flex-wrap:wrap; align-items:center;}
+@media (max-width:520px){.hero-ctas .btn{flex-direction:column; gap:0; width:100%; text-align:center; white-space:normal;} .hero-ctas .btn small{margin-top:3px;}}
 .hero-trust{display:flex; gap:24px; margin-top:36px; flex-wrap:wrap;}
 .hero-trust div{font-family:var(--font-mono); font-size:11.5px; color:rgba(244,241,232,0.55);}
 .hero-trust strong{display:block; font-family:var(--font-display); font-size:21px; color:var(--gold-400); font-weight:600;}
@@ -206,7 +214,7 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; 
 .ticker-verdict span{font-family:var(--font-mono); font-size:12.5px; color:#bdf5da; font-weight:500;}
 
 @media (max-width:940px){
-  .hero-grid{grid-template-columns:1fr; gap:48px;}
+  .hero-grid{grid-template-columns:minmax(0,1fr); gap:48px;}
 }
 
 /* ============ MARQUEE / METHOD STRIP ============ */
@@ -493,6 +501,7 @@ table.compare tbody tr.eco-row td{font-size:12.3px; font-family:var(--font-mono)
 /* ============ FOOTER ============ */
 footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 30px; border-top:1px solid var(--line-dark);}
 .footer-grid{display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:40px; margin-bottom:36px;}
+@media (max-width:760px){.footer-grid{grid-template-columns:minmax(0,1fr); gap:32px;}}
 .footer-grid h5{font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(244,241,232,0.4); margin-bottom:16px;}
 .footer-grid p, .footer-grid li{font-size:13.5px; line-height:1.7;}
 .footer-grid li a:hover{color:var(--gold-400);}
