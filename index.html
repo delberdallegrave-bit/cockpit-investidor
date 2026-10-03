@@ -874,7 +874,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
           <li><span class="chk">✓</span>Análise de FIIs e ETFs</li>
           <li><span class="chk">✓</span>Config de premissas + Apoio a Aportes</li>
         </ul>
-        <a href="" data-checkout="basico" class="btn btn-outline btn-block">Começar minha análise</a>
+        <a href="" data-checkout="basico" class="btn btn-outline btn-block hotmart-fb">Começar minha análise</a>
       </div>
 
       <div class="plan-card featured reveal">
@@ -891,7 +891,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
           <li><span class="chk">✓</span>Valuation Peter Lynch (PEG Ratio)</li>
           <li><span class="chk">✓</span>Valuation Projetivo (5 anos)</li>
         </ul>
-        <a href="" data-checkout="pro" class="btn btn-gold btn-block">Quero o Cockpit PRO</a>
+        <a href="" data-checkout="pro" class="btn btn-gold btn-block hotmart-fb">Quero o Cockpit PRO</a>
       </div>
 
       <div class="plan-card premium reveal">
@@ -908,7 +908,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
           <li><span class="chk">✓</span>Radar de Ações e Radar de FIIs</li>
           <li><span class="chk">✓</span>Inputs personalizados (Ações e FIIs)</li>
         </ul>
-        <a href="" data-checkout="vip" class="btn btn-outline btn-block">Quero o Cockpit VIP</a>
+        <a href="" data-checkout="vip" class="btn btn-outline btn-block hotmart-fb">Quero o Cockpit VIP</a>
       </div>
     </div>
 
@@ -1177,14 +1177,48 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
 // Substitua os três placeholders abaixo pelos links reais de pagamento.
 // (Também é possível trocar direto nos href dos botões de plano, pelos atributos data-checkout.)
 const CHECKOUT_LINKS = {
-  basico: '',
-  pro:    '',
-  vip:    ''
+  basico: 'https://pay.hotmart.com/E107875455T?checkoutMode=2&off=e0m71aj7',
+  pro:    'https://pay.hotmart.com/E107875455T?checkoutMode=2&off=mtzja2m3',
+  vip:    'https://pay.hotmart.com/E107875455T?checkoutMode=2&off=mzzddc93'
 };
 document.querySelectorAll('[data-checkout]').forEach(a=>{
   const url = CHECKOUT_LINKS[a.dataset.checkout];
   if(url && !url.startsWith('LINK_PAGAMENTO_')) a.setAttribute('href', url);
 });
+
+// ============ WIDGET HOTMART (checkout em pop-up) ============
+// Os botões de plano têm a classe "hotmart-fb", que faz o checkout abrir em pop-up no desktop
+// (no celular o widget leva direto à página de pagamento). Não usamos a classe "hotmart__button-checkout"
+// porque ela aplica o visual verde padrão da Hotmart por cima do layout da página.
+// O widget é carregado depois do load, para não pesar na abertura da página.
+(function(){
+  const guard = [...document.querySelectorAll('a.hotmart-fb')].map(a => ({a, parent:a.parentNode, next:a.nextSibling}));
+  if(!guard.length) return;
+
+  // Proteção: se a API da Hotmart não responder (instabilidade, bloqueador de anúncios), o widget remove
+  // da página todo link com "hotmart.com". Se isso acontecer, devolvemos os botões ao lugar na hora.
+  const restore = () => guard.forEach(({a,parent,next}) => {
+    if(!a.isConnected) parent.insertBefore(a, next && next.parentNode === parent ? next : null);
+  });
+  const mo = new MutationObserver(restore);
+  guard.forEach(({parent}) => mo.observe(parent, {childList:true}));
+
+  function importHotmart(){
+    const s = document.createElement('script');
+    s.src = 'https://static.hotmart.com/checkout/widget.min.js';
+    s.async = true;
+    document.head.appendChild(s);
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.type = 'text/css';
+    l.href = 'https://static.hotmart.com/css/hotmart-fb.min.css';
+    document.head.appendChild(l);
+  }
+  window.addEventListener('load', () => {
+    if('requestIdleCallback' in window) requestIdleCallback(importHotmart, {timeout:3000});
+    else setTimeout(importHotmart, 1500);
+  });
+})();
 
 // ============ CONFIGURAÇÃO DAS REDES SOCIAIS ============
 // Substitua LINK_YOUTUBE pela URL do seu canal. Instagram e WhatsApp já estão configurados.
