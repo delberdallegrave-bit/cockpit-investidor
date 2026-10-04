@@ -341,11 +341,14 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; line-height:1.08; 
 .plan-card .ribbon.emerald{background:var(--emerald-500); color:var(--navy-950);}
 .plan-card .step{font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; color:rgba(244,241,232,0.45); text-transform:uppercase;}
 .plan-card h3{font-size:23px; margin:10px 0 4px; color:var(--paper);}
-.plan-card .price{margin:16px 0 2px; display:flex; align-items:baseline; gap:6px;}
-.plan-card .price .num{font-family:var(--font-display); font-size:36px; font-weight:600; color:var(--paper);}
-.plan-card .price .cur{font-family:var(--font-mono); font-size:15px; color:rgba(244,241,232,0.6);}
-.plan-card .price .per{font-family:var(--font-mono); font-size:12px; color:rgba(244,241,232,0.45);}
-.plan-card .installment{font-family:var(--font-mono); font-size:11.5px; color:var(--emerald-500); margin-bottom:16px;}
+.plan-card .price{margin:18px 0 4px; display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 8px;}
+.plan-card .price .x{font-family:var(--font-mono); font-size:15px; color:rgba(244,241,232,0.75);}
+.plan-card .price .cur{font-family:var(--font-mono); font-size:16px; color:rgba(244,241,232,0.6);}
+.plan-card .price .num{font-family:var(--font-display); font-size:46px; font-weight:600; line-height:1; color:var(--paper);}
+.plan-card .installment{display:inline-block; font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.02em; color:var(--emerald-500); background:rgba(14,203,129,0.12); border:1px solid rgba(14,203,129,0.3); padding:3px 10px; border-radius:999px; margin:6px 0 12px; align-self:flex-start;}
+.plan-card .cash{font-size:16px; color:rgba(244,241,232,0.85); line-height:1.4;}
+.plan-card .cash b{color:var(--paper); font-weight:700;}
+.plan-card .perday{font-family:var(--font-mono); font-size:11.5px; color:rgba(244,241,232,0.5); margin:4px 0 16px;}
 .plan-card .desc{font-size:13.3px; color:rgba(244,241,232,0.55); margin-bottom:20px; line-height:1.5;}
 .plan-card ul{display:flex; flex-direction:column; gap:11px; margin-bottom:26px; flex-grow:1;}
 .plan-card li{display:flex; gap:10px; font-size:13.6px; color:rgba(244,241,232,0.85); line-height:1.45;}
@@ -872,8 +875,10 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
       <div class="plan-card reveal">
         <div class="step">Nível 01</div>
         <h3>Básico</h3>
-        <div class="price"><span class="cur">R$</span><span class="num">147</span><span class="per">/ano</span></div>
-        <div class="installment">ou 12x de R$ 12,25</div>
+        <div class="price"><span class="x">12x de</span><span class="cur">R$</span><span class="num">12,25</span></div>
+        <div class="installment">sem juros no cartão</div>
+        <div class="cash">ou <b>R$ 147 à vista</b> · acesso por 12 meses</div>
+        <div class="perday">cerca de R$ 0,40 por dia</div>
         <p class="desc">Para quem quer começar a tomar decisões com instrumentos essenciais e já calcular o preço teto hoje.</p>
         <ul>
           <li><span class="chk">✓</span>Resumo dos Ativos — dashboard geral da carteira</li>
@@ -890,8 +895,10 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
         <div class="ribbon gold">⭐ Mais vendido</div>
         <div class="step">Nível 02</div>
         <h3>PRO</h3>
-        <div class="price"><span class="cur">R$</span><span class="num">347</span><span class="per">/ano</span></div>
-        <div class="installment">ou 12x de R$ 28,92</div>
+        <div class="price"><span class="x">12x de</span><span class="cur">R$</span><span class="num">28,92</span></div>
+        <div class="installment">sem juros no cartão</div>
+        <div class="cash">ou <b>R$ 347 à vista</b> · acesso por 12 meses</div>
+        <div class="perday">cerca de R$ 0,95 por dia</div>
         <p class="desc">Para quem quer ampliar os instrumentos e analisar crescimento futuro, não só o preço de hoje.</p>
         <ul>
           <li class="inherit"><span class="chk">✓</span>Tudo do plano Básico</li>
@@ -907,8 +914,10 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
         <div class="ribbon emerald">🏆 Completo</div>
         <div class="step">Nível 03</div>
         <h3>VIP</h3>
-        <div class="price"><span class="cur">R$</span><span class="num">697</span><span class="per">/ano</span></div>
-        <div class="installment">ou 12x de R$ 58,09</div>
+        <div class="price"><span class="x">12x de</span><span class="cur">R$</span><span class="num">58,09</span></div>
+        <div class="installment">sem juros no cartão</div>
+        <div class="cash">ou <b>R$ 697 à vista</b> · acesso por 12 meses</div>
+        <div class="perday">cerca de R$ 1,91 por dia</div>
         <p class="desc">Para quem quer o Cockpit completo, com todos os instrumentos disponíveis.</p>
         <ul>
           <li class="inherit"><span class="chk">✓</span>Tudo do Básico + PRO</li>
@@ -946,7 +955,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
           <tr><td class="cat">Radar de FIIs</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
           <tr><td class="cat">Inputs Personalizados</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
           <tr class="price-row"><td class="cat">Preço Anual</td><td>R$ 147</td><td class="gold">R$ 347</td><td class="emerald">R$ 697</td></tr>
-          <tr class="price-row"><td class="cat">Parcelamento</td><td>12x R$ 12,25</td><td class="gold">12x R$ 28,91</td><td class="emerald">12x R$ 58,08</td></tr>
+          <tr class="price-row"><td class="cat">Parcelamento</td><td>12x R$ 12,25</td><td class="gold">12x R$ 28,92</td><td class="emerald">12x R$ 58,09</td></tr>
           <tr class="eco-row"><td class="cat">Economia</td><td>—</td><td>Economize R$ 350 vs o VIP</td><td>Pacote completo — todos os métodos</td></tr>
         </tbody>
       </table>
@@ -958,7 +967,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
 
     <figure class="product-cover reveal" style="margin:48px auto 0;">
       <img src="img/cockpit-do-investidor-produto.png" alt="Capa do Cockpit do Investidor: cabine de cockpit com painéis de Ações, FIIs, ETFs, Valuation, Carteira, Radares e Score, e a frase “Você é o piloto. O Cockpit reúne os instrumentos.”" width="1536" height="1024" loading="lazy">
-      <!--<figcaption>Esta é a capa do Cockpit do Investidor, a mesma que você vê na página de pagamento. Imagem ilustrativa: as telas reais do painel estão em <a href="#demo">Instrumentos</a>.</figcaption>-->
+      <figcaption>Esta é a capa do Cockpit do Investidor, a mesma que você vê na página de pagamento. Imagem ilustrativa: as telas reais do painel estão em <a href="#demo">Instrumentos</a>.</figcaption>
     </figure>
   </div>
 </section>
@@ -1177,7 +1186,7 @@ footer{background:var(--navy-950); color:rgba(244,241,232,0.55); padding:56px 0 
 
 <!-- ============ STICKY CTA (aparece ao rolar) ============ -->
 <div class="sticky-cta" id="stickyCta">
-  <div class="info">A partir de<b>R$ 147/ano</b></div>
+  <div class="info">A partir de<b>12x R$ 12,25 <span style="font-weight:400;opacity:.65;">ou R$ 147 à vista</span></b></div>
   <a href="#planos" class="btn btn-gold">Comprar Agora</a>
 </div>
 
